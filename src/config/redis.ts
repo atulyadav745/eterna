@@ -5,23 +5,47 @@ class RedisClient {
   private client: Redis;
 
   constructor() {
-    this.client = new Redis({
-      host: config.redis.host,
-      port: config.redis.port,
-      password: config.redis.password,
-      retryStrategy: (times) => {
-        const delay = Math.min(times * 50, 2000);
-        return delay;
-      },
-      maxRetriesPerRequest: null, // Required for BullMQ
-    });
+    // If REDIS_PASSWORD contains a full connection string (redis://...), use it
+    // Otherwise use individual host/port/password
+    const redisPassword = config.redis.password;
+    
+    if (redisPassword && redisPassword.startsWith('redis://')) {
+      // Use connection string
+      this.client = new Redis(redisPassword, {
+        retryStrategy: (times) => {
+          const delay = Math.min(times * 50, 2000);
+          return delay;
+        },
+        maxRetriesPerRequest: null, // Required for BullMQ
+        enableReadyCheck: true,
+        connectTimeout: 10000,
+      });
+    } else {
+      // Use individual config
+      this.client = new Redis({
+        host: config.redis.host,
+        port: config.redis.port,
+        password: redisPassword,
+        retryStrategy: (times) => {
+          const delay = Math.min(times * 50, 2000);
+          return delay;
+        },
+        maxRetriesPerRequest: null, // Required for BullMQ
+        enableReadyCheck: true,
+        connectTimeout: 10000,
+      });
+    }
 
-    this.client.on('error', (err) => {
+    this.client.on('error', (err: Error) => {
       console.error('Redis error:', err);
     });
 
     this.client.on('connect', () => {
       console.log('Redis connected');
+    });
+
+    this.client.on('ready', () => {
+      console.log('Redis ready');
     });
   }
 

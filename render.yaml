@@ -26,7 +26,7 @@ services:
       - key: LOG_LEVEL
         value: info
       - key: DATABASE_URL
-        sync: false
+        sync: false  # IMPORTANT: You must manually set this in Render dashboard after creating PostgreSQL
       - key: REDIS_HOST
         fromService:
           type: redis
@@ -37,6 +37,11 @@ services:
           type: redis
           name: eterna-redis
           property: port
+      - key: REDIS_PASSWORD
+        fromService:
+          type: redis
+          name: eterna-redis
+          property: connectionString
 
   # Redis instance
   - type: redis

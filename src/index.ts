@@ -9,6 +9,22 @@ import { OrderQueue } from './queue/order.queue';
 import { registerOrderRoutes } from './api/order.routes';
 
 async function start() {
+  // Check required environment variables
+  if (!process.env.DATABASE_URL) {
+    Logger.error('DATABASE_URL environment variable is not set');
+    Logger.error('Please add DATABASE_URL to your Render service environment variables');
+    process.exit(1);
+  }
+
+  if (!process.env.REDIS_HOST) {
+    Logger.error('REDIS_HOST environment variable is not set');
+    Logger.error('Redis service may not be properly configured');
+    process.exit(1);
+  }
+
+  Logger.info('Starting Eterna Order Execution Engine...');
+  Logger.info('Environment:', config.server.env);
+
   const fastify = Fastify({
     logger: false, // Using custom logger
   });
@@ -31,17 +47,53 @@ async function start() {
     const { healthRoutes } = await import('./api/health.routes');
     await fastify.register(healthRoutes);
 
-    // Health checks
-    const dbHealthy = await database.healthCheck();
-    const redisHealthy = await redisClient.healthCheck();
+    // Health checks with retries
+    Logger.info('Performing health checks...');
+    
+    let dbHealthy = false;
+    let redisHealthy = false;
+    const maxRetries = 5;
+    const retryDelay = 3000;
+
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        dbHealthy = await database.healthCheck();
+        if (dbHealthy) {
+          Logger.info('Database connected successfully');
+          break;
+        }
+      } catch (error: any) {
+        Logger.warn(`Database health check attempt ${i + 1}/${maxRetries} failed: ${error.message}`);
+        if (i < maxRetries - 1) {
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
+        }
+      }
+    }
+
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        redisHealthy = await redisClient.healthCheck();
+        if (redisHealthy) {
+          Logger.info('Redis connected successfully');
+          break;
+        }
+      } catch (error: any) {
+        Logger.warn(`Redis health check attempt ${i + 1}/${maxRetries} failed: ${error.message}`);
+        if (i < maxRetries - 1) {
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
+        }
+      }
+    }
 
     if (!dbHealthy) {
-      Logger.error('Database health check failed');
+      Logger.error('Database health check failed after all retries');
+      Logger.error('Please ensure DATABASE_URL environment variable is set correctly');
       throw new Error('Database not available');
     }
 
     if (!redisHealthy) {
-      Logger.error('Redis health check failed');
+      Logger.error('Redis health check failed after all retries');
+      Logger.error('Please ensure REDIS_HOST and REDIS_PORT environment variables are set correctly');
       throw new Error('Redis not available');
     }
 
