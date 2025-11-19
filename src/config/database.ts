@@ -5,16 +5,29 @@ class Database {
   private pool: Pool;
 
   constructor() {
-    this.pool = new Pool({
-      host: config.database.host,
-      port: config.database.port,
-      database: config.database.name,
-      user: config.database.user,
-      password: config.database.password,
-      max: 20,
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 2000,
-    });
+    // Use DATABASE_URL if provided (for Render deployment), otherwise use individual config
+    if (config.database.url && config.database.url !== 'postgresql://postgres:postgres@localhost:5432/eterna_orders') {
+      // Use connection string (preferred for production)
+      this.pool = new Pool({
+        connectionString: config.database.url,
+        ssl: config.server.env === 'production' ? { rejectUnauthorized: false } : false,
+        max: 20,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 10000,
+      });
+    } else {
+      // Use individual config (for local development)
+      this.pool = new Pool({
+        host: config.database.host,
+        port: config.database.port,
+        database: config.database.name,
+        user: config.database.user,
+        password: config.database.password,
+        max: 20,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 10000,
+      });
+    }
 
     this.pool.on('error', (err: Error) => {
       console.error('Unexpected database error:', err);
