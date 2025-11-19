@@ -1,0 +1,202 @@
+{
+  "info": {
+    "name": "Eterna Order Execution Engine",
+    "_postman_id": "eterna-order-execution",
+    "description": "API collection for testing the Order Execution Engine with DEX routing",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/health",
+          "host": ["{{base_url}}"],
+          "path": ["health"]
+        },
+        "description": "Check if the server and dependencies (Redis, PostgreSQL) are healthy"
+      },
+      "response": []
+    },
+    {
+      "name": "Submit Market Order - SOL to USDC",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"orderType\": \"MARKET\",\n  \"tokenIn\": \"SOL\",\n  \"tokenOut\": \"USDC\",\n  \"amountIn\": 1.5\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/orders/execute",
+          "host": ["{{base_url}}"],
+          "path": ["api", "orders", "execute"]
+        },
+        "description": "Submit a market order to swap 1.5 SOL for USDC. Returns orderId for tracking."
+      },
+      "response": []
+    },
+    {
+      "name": "Submit Market Order - Small Amount",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"orderType\": \"MARKET\",\n  \"tokenIn\": \"SOL\",\n  \"tokenOut\": \"USDC\",\n  \"amountIn\": 0.5\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/orders/execute",
+          "host": ["{{base_url}}"],
+          "path": ["api", "orders", "execute"]
+        },
+        "description": "Submit a smaller market order (0.5 SOL)"
+      },
+      "response": []
+    },
+    {
+      "name": "Submit Market Order - Large Amount",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"orderType\": \"MARKET\",\n  \"tokenIn\": \"SOL\",\n  \"tokenOut\": \"USDC\",\n  \"amountIn\": 10.0\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/orders/execute",
+          "host": ["{{base_url}}"],
+          "path": ["api", "orders", "execute"]
+        },
+        "description": "Submit a larger market order (10 SOL) to test routing with higher liquidity impact"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Order Status",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/orders/{{order_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["api", "orders", "{{order_id}}"]
+        },
+        "description": "Retrieve complete order details including routing decision, execution price, and txHash. Replace {{order_id}} with actual order ID from submit response."
+      },
+      "response": []
+    },
+    {
+      "name": "Submit Invalid Order - Missing Fields",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"orderType\": \"MARKET\",\n  \"tokenIn\": \"SOL\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/orders/execute",
+          "host": ["{{base_url}}"],
+          "path": ["api", "orders", "execute"]
+        },
+        "description": "Test validation - should return 400 error for missing required fields"
+      },
+      "response": []
+    },
+    {
+      "name": "Submit Invalid Order - Zero Amount",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"orderType\": \"MARKET\",\n  \"tokenIn\": \"SOL\",\n  \"tokenOut\": \"USDC\",\n  \"amountIn\": 0\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/orders/execute",
+          "host": ["{{base_url}}"],
+          "path": ["api", "orders", "execute"]
+        },
+        "description": "Test validation - should return 400 error for invalid amount"
+      },
+      "response": []
+    },
+    {
+      "name": "Submit Invalid Order - Unsupported Type",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"orderType\": \"LIMIT\",\n  \"tokenIn\": \"SOL\",\n  \"tokenOut\": \"USDC\",\n  \"amountIn\": 1.0\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/orders/execute",
+          "host": ["{{base_url}}"],
+          "path": ["api", "orders", "execute"]
+        },
+        "description": "Test validation - LIMIT orders not yet supported, should return 400"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Non-Existent Order",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/orders/00000000-0000-0000-0000-000000000000",
+          "host": ["{{base_url}}"],
+          "path": ["api", "orders", "00000000-0000-0000-0000-000000000000"]
+        },
+        "description": "Test error handling - should return 404 for non-existent order"
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "order_id",
+      "value": "replace-with-actual-order-id",
+      "type": "string"
+    }
+  ]
+}

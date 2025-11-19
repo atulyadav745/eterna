@@ -1,0 +1,48 @@
+{
+  "name": "eterna",
+  "version": "1.0.0",
+  "description": "Order Execution Engine with DEX routing and WebSocket updates",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "nodemon --watch src --ext ts --exec ts-node src/index.ts",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f"
+  },
+  "keywords": ["order-execution", "dex-routing", "websocket", "solana"],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@fastify/websocket": "^11.2.0",
+    "@types/node": "^24.10.1",
+    "bullmq": "^5.63.2",
+    "dotenv": "^17.2.3",
+    "fastify": "^5.6.2",
+    "ioredis": "^5.8.2",
+    "pg": "^8.16.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3",
+    "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/pg": "^8.15.6",
+    "@types/uuid": "^10.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.47.0",
+    "@typescript-eslint/parser": "^8.47.0",
+    "eslint": "^9.39.1",
+    "jest": "^30.2.0",
+    "nodemon": "^3.1.11",
+    "prettier": "^3.6.2",
+    "ts-jest": "^29.4.5"
+  }
+}
