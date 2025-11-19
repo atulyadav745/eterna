@@ -6,7 +6,7 @@ import { OrderStatus } from '../models/order.model';
 import { OrderService } from '../services/order.service';
 import { MockDexRouter } from '../services/dex-router.service';
 import { exponentialBackoff, calculatePriceDifference, calculatePriceDifferencePercent } from '../utils/helpers';
-import { WebSocketManager } from '../websocket/websocket.manager';
+import { WebSocketManager } from '../websocket';
 
 export interface OrderJob {
   orderId: string;
