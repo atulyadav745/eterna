@@ -41,7 +41,7 @@ services:
           property: port
 
   # PostgreSQL database
-  - type: postgres
+  - type: postgresql
     name: eterna-postgres
     plan: free
     databaseName: eterna_orders
