@@ -67,12 +67,6 @@ Backend service for processing cryptocurrency orders with DEX routing (Raydium v
 
 ### 1. Clone and Install Dependencies
 
-```bash
-git clone <your-repo-url>
-cd eterna
-npm install
-```
-
 ### 2. Configure Environment
 
 ```bash
@@ -104,19 +98,6 @@ npm start
 ## 🚀 Quick Start
 
 The server starts on `http://localhost:3000`
-
-## 🌐 Deployment
-
-See [DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md) for step-by-step Render.com deployment instructions.
-
-**Quick Deploy**:
-1. Push to GitHub
-2. Connect to Render Blueprint
-3. Deploy automatically with `render.yaml`
-
-Full guide: [DEPLOYMENT.md](DEPLOYMENT.md)
-
-## 📡 API Documentation
 
 ### Submit Order
 
@@ -217,24 +198,3 @@ Key environment variables in `.env`:
 3. **PostgreSQL**: Persistent order history with ACID guarantees
 4. **Redis**: Fast active order storage and queue backend
 5. **Mock-first approach**: Allows testing full system without blockchain complexity
-
-## 🚢 Deployment
-
-Coming soon - deployment to free hosting platform with public URL.
-
-## 📹 Video Demo
-
-Coming soon - YouTube video demonstrating concurrent orders, WebSocket updates, and DEX routing.
-
-## 📦 Deliverables Status
-
-- [x] Project setup and architecture
-- [x] Complete implementation (DEX router, order processing, queue, WebSocket)
-- [x] Unit & integration tests (36 tests passing, ≥10 required ✅)
-- [x] Postman/Insomnia collection (`postman_collection.json` + API Testing Guide)
-- [ ] Deployment to free hosting
-- [ ] Video demonstration
-
-## 📝 License
-
-ISC
